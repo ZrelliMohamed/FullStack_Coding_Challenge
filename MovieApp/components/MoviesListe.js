@@ -14,14 +14,7 @@ const MoviesListe = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        let response;
-        if (searchQuery === '') {
-          // Fetch default data if searchQuery is empty
-          response = await axios.get(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`)
-        } else {
-          // Fetch search data based on searchQuery
-          response = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchQuery}`)
-        }
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`)
         setFilms(response.data.results);
       } catch (error) {
         console.log(error);
@@ -29,7 +22,7 @@ const MoviesListe = () => {
     }
 
     fetchData()
-  }, [searchQuery])
+  }, [])
 
   const handleSearch = (query) => {
     setSearchQuery(query)
@@ -38,6 +31,10 @@ const MoviesListe = () => {
   const handleFavorites = () => {
     navigation.navigate('Favorit')
   }
+
+  const filteredFilms = films.filter((film) =>
+    film.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -52,13 +49,13 @@ const MoviesListe = () => {
           <Ionicons name="heart" size={24} color="black" />
         </TouchableOpacity>
       </View>
-      {films.map((film, i) => {
+      {filteredFilms.map((film, i) => {
         if (i % 2 === 0) {
           return (
             <View key={i} style={styles.cardContainer}>
               <MovieCard film={film}/>
-              {films[i + 1] &&
-              <MovieCard film={films[i + 1]}/>
+              {filteredFilms[i + 1] &&
+              <MovieCard film={filteredFilms[i + 1]}/>
               }
             </View>
           )
